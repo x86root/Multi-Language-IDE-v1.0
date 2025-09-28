@@ -184,7 +184,35 @@ class MainWindow(QMainWindow):
         # If yes, quit application
         if reply == QMessageBox.Yes:
             QApplication.instance().quit()
-    
+
+    def openFile(self):
+        options = QFileDialog.Options()
+        
+        # Opens dialog to select file, returns file path and file type.
+        file_path, _ = QFileDialog.getOpenFileName(self, "Open File", "", 	# Show all possible file extensions to remind users they can run any language
+                                                   "All Files (*);;Text Files (*.txt);;Python Files(*.py);;C++ Files(*.cpp, *.h);;JS Files (*.node)", 
+                                                   options=options)			# This controls the dropdown in file manager itself
+        if file_path:
+            self.label.setText(f"Selected File: {file_path}")
+
+    def saveFile(self):
+        
+        # If there is no save path set, ie haven't saved it yet
+        if self.path is None:
+                                # Calls the save as method from below and forces user to create save path
+            return self.saveFileAs()
+                                # Otherwise it saves to the path already set
+        self.saveToPath()
+        
+    def saveFileAs(self):
+        options = QFileDialog.Options()
+        file_path, _ = QFileDialog.getSaveFileName(self, "Save File", "", 			# Remove after txt to have default
+                                                   "All Files (*);;Text Files (*.txt);;Python Files(*.py);;C++ Files(*.cpp, *.h);;JS Files (*.node)", 
+                                                   options=options)
+        if not path:
+            return 
+
+	
     
     def compileSetup(self, file):
     # Function from stack to understand the compiler call to other languages @AKX & @mousetail.
@@ -221,14 +249,29 @@ class MainWindow(QMainWindow):
         else: 
             raise ValueError(f"Unsupported file type: {ext}")
 
+    # For Print button if desired.
+    def file_print(self):
+
+        # Creating a QPrintDialog
+        export = QPrintDialog()
+
+        # When you click Print executes 
+        if export.exec_():
+
+            # Print the text
+            self.editor.print_(export.printer())
+
+
+#--------------------------------------------------------------------------------------------------------------------
 # Standard PyQT setup 
 app = QApplication(sys.argv)    # Creates application object
+
 window = MainWindow()           # Incorporates our custom window class from above as main window
+
 app.exec_()                     # Event loop, keeps app running until exit
 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~NOTES AND TODO~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
-# GitHub Desktop didn't upload my clone I worked on incorporating saves and opening files. Will merge them when I access my other system. 
-
-# TODO test compiler and see if it works before trying to add languages. Also better design.
+# TODO: test compiler and see if it works before trying to add languages - need to create a call to the compiler function. Also better design.
+# 		Add multiple tabs so users can have multiple documents open at once. 
 # Bundle all compilers with the install of this so user can download and go without having to manually do it.
