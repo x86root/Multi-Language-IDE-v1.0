@@ -117,7 +117,7 @@ class MainWindow(QMainWindow):
 								
 										
        # The lambda defers execution until the user clicks the Undo action.
-										
+	   # We are defining the lambda function as the QAction and then calling it when the action is triggered.									
 
         # Redo button - same as above
         redo_action = QAction("Redo", self)
@@ -195,17 +195,17 @@ class MainWindow(QMainWindow):
         
     
 #------------------------------------------End of Menu/Toolbar --------------------------------------------------------------------------------------    
-        # Displaying messages to status bar. This is the welcome message until replaced .
+   # Displaying messages to status bar. This is the welcome message until replaced .
         self.status.showMessage("~~~~~~~~~~~~~~Welcome to The MultiLang IDE --- Share with Friends and Code Away!~~~~~~~~~~~~~~")
         #setStatusTip()
         
-        # Redundant show window call 
+        # Required for displaying actual window
         self.show()    
     
         
         
-        # setStyleSheet() method included with PyQT. Using my experience with CSS it actually was really simple to write. This is just starting code.
-        # https://doc.qt.io/archives/qt-5.15/stylesheet-reference.html
+ # setStyleSheet() method included with PyQT. Using my experience with CSS it actually was really simple to write. This is just starting code.
+ # https://doc.qt.io/archives/qt-5.15/stylesheet-reference.html
         self.setStyleSheet("""
         /* Whole page*/
     QMainWindow {
@@ -323,10 +323,17 @@ class MainWindow(QMainWindow):
 
 #-------------------------------------------------------------------------------------------------------------------------
 
-       # Helper to get the current editor from the active tab
+       # Function required for the self. objects to be within scope. Gathers self.editor for example for open_file to use
     def getCurrentEditor(self):
         current_widget = self.tabs.currentWidget()
         return current_widget.findChild(QPlainTextEdit)
+
+
+###
+	  # Function repeating the above but for the file path label instead.
+    def getCurrentLabel(self):
+        current_widget = self.tabs.currentWidget()
+        return current_widget.findChild(QLabel)
 
 
 ###
@@ -366,10 +373,15 @@ class MainWindow(QMainWindow):
         if file_path:
             self.path = file_path
             
+            # With is safer then traditional routes bc with will always close the file properly and avoid memory leaks or file locks.
+            # using with, open file path as 'r' for 'read'. f is the file name we give it for easy usage
             with open(file_path, 'r') as f:
-                self.editor.setPlainText(f.read())
-            self.label.setText(f"Selected File: {file_path}")
-
+				
+				# Read the contents of the file as a string and applies to the editor object
+                self.getCurrentEditor().setPlainText(f.read())
+                
+			# Fills label at top of editor with file path				
+            self.getCurrentLabel().setText(f"Selected File: {file_path}")
 
 ###
 
